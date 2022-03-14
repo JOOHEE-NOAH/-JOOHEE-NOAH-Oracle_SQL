@@ -21,6 +21,23 @@ select * from scott.emp;
 GRANT SELECT on scott.emp TO usertest01;
 GRANT update on scott.emp TO usertest01;
 
+--with grant option  --> 니가 해라 권한 부여
+drop user usertest04;
+create user usertest04 identified by tiger;
+
+grant connect, resource to usertest04; --기본적인 권한 주기
+grant select on scott.emp to usertest04 with grant option; --남한테 권한 주는거 까지 너가해라.
+
+--usertest 04 에서 scott.emp 조회 test
+create user usertest05 identified by tiger;
+grant connect, resource to usertest05;
+
+---------------------------------------------------
+---  권한 회수
+---------------------------------------------------
+revoke select on scott.emp from usertest04 cascade constraints;
+--> usertest04로 부터 권한 뺏어 오면서 cascade 써서 usertest05의 권한까지 회수.
+
 -----------  과제    -----------------
 --1. usertest02 생성
 drop user usertest02;
