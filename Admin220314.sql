@@ -23,3 +23,7 @@ grant dba to usertest03;
 create or replace directory mdBackup2 as 'C:\orabackup';
 
 
+--2. Backup test ∞Ë¡§
+Drop User scott3;
+CREATE USER scott3 IDENTIFIED BY tiger;
+grant dba to scott3;
