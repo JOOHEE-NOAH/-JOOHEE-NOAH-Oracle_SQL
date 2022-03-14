@@ -49,13 +49,46 @@ DELETE dept
 where deptno = 50;
 
 --------------------------------------------
--------  1.   Data  Tablespace  --------------
+-------  ★★   PL/SQL  ★★--------------
 --------------------------------------------
+--- 1. 함수(Function)
+--- 특정한 수에 세금을 7%로 계산하는 Function을 작성하면
+create or replace FUNCTION tax
+    (p_num in number) -- Parameter
+RETURN number         -- Return Value
+Is
+    v_tax number;     -- 변수 선언
+BEGIN                 --함수 시작
+--세금 7%
+    v_tax := p_num * 0.07;
+    RETURN(v_tax);
+END;
+
+--is 와 begin 사이에 변수 선언을 해준다. 변수라는 의미로 v_로 많이 작성한다.
+-- begin과 end 사이에 로직을 구성한다. =이 아니라 :=임을 명심!
+
+--2.함수호출
+select tax(200) from dual;
+
+select profno , name, sal, tax(sal)
+from professor;
 
 
-
-
-
+--------------------------------------------------------------
+-- Procedure
+-- 1. 파라메타 : (p_deptno , p_dname ,   p_loc)
+-- 2. dept TBL에 Insert Procedure
+--------------------------------------------------------------
+CREATE OR REPLACE PROCEDURE Dept_Insert
+    (p_deptno in dept.deptno%type, --dept.deptno%type: dept테이블에서 deptno의 data_type이 어떻든 똑같이 해줘라. 라는 뜻
+     p_dname in dept.dname%type,
+     p_loc in dept.loc%type)
+IS
+BEGIN
+    INSERT into dept VALUES(p_deptno, p_dname, p_loc);
+    COMMIT;
+END;
+    
 
 
 
