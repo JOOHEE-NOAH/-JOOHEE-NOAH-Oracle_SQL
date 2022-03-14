@@ -48,7 +48,7 @@ from user_ind_columns;
 select * from emp where ename = 'SMITH';
 
 --- Optimizer
---- 1) RBO(rule based optimizer)  2) CBO(cost based optimizer)
+--- 1) RBO(rule based optimizer): 정해진 규칙대로만 실행  2) CBO(cost based optimizer)
 --RBO 변경
 ALTER SESSION SET OPTIMIZER_MODE=RULE;
 
@@ -108,6 +108,9 @@ from professor;
 
 --view 제거
 drop view VIEW_PROFESSOR;
+
+-- select
+select * from VIEW_PROFESSOR;
 
 -- userid 제거 --> 재생성
 create or replace view VIEW_PROFESSOR AS
