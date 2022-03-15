@@ -281,12 +281,99 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('ERROR!!!-지정한 급여가 너무 적습니다. 1000이상으로 다시 입력하세요');      
 END;
 
+-----------------------------------------------------
+-- Fetch 문 
+-- SQL> EXECUTE  Cur_sal_Hap (20);
+-- CURSOR 문 이용 구현 
+-- 부서만큼 반복 
+-- 	부서명 : ACCOUNTING
+-- 	인원수 : 5
+-- 	급여합 : 5000
+-- 	데이터 입력 성공
+-----------------------------------------------------
+create or replace PROCEDURE Cur_sal_Hap
+(p_deptno    IN  emp.deptno%TYPE)
+IS  
+    CURSOR dept_sum IS
+    SELECT dname, Count(*) cnt, SUM(sal) sumSal
+    FROM emp e, Dept d
+    WHERE e.deptno = d.deptno 
+    AND e.deptno LIKE p_deptno||'%'
+    GROUP BY dname;
+
+    v_dname dept.dname%TYPE;
+    v_cnt number;
+    v_sumSal number;
+BEGIN
+    DBMS_OUTPUT.ENABLE;
+    OPEN dept_sum;
+    LOOP
+        --3.FETCH단계
+        FETCH dept_sum INTO v_dname, v_cnt, v_sumSal;
+        EXIT WHEN dept_sum%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE('부서명 : ' || v_dname);
+        DBMS_OUTPUT.PUT_LINE('인원수 : ' || v_cnt);
+        DBMS_OUTPUT.PUT_LINE('급여합 : ' || v_sumSal);
+    END LOOP;
+
+    CLOSE dept_sum;
+END Cur_sal_Hap;
 
 
+-----------------------------------------------------------
+-- FOR문을 사용하면 커서의 OPEN, FETCH, CLOSE가 자동 발생하므로 
+-- 따로 기술할 필요가 없고, 레코드 이름도 자동
+-- 선언되므로 따로 선언할 필요가 없다. FOR문 변환
+--실제 개발자들이 많이 사용하는 방법
+-----------------------------------------------------------
+CREATE OR REPLACE PROCEDURE ForCursor_Test
+IS
+-- Cursor 선언
+-- ACCOUNTING	3	9250
+-- OPERATIONS	2	8000
+-- 인사팀      	2	5000
+-- RESEARCH	    5	10955
+-- SALES	    6	9250
+CURSOR dept_sum IS
+        SELECT b.dname, COUNT(a.empno) cnt, SUM(a.sal) salary
+        FROM emp a, dept b
+        WHERE a.deptno = b.deptno
+        GROUP BY b.dname;
+BEGIN
+    DBMS_OUTPUT.ENABLE;
+    
+    --cursor를 for문에서 실행시킨다.
+    FOR emp_list IN dept_sum LOOP
+            DBMS_OUTPUT.PUT_LINE('부서명 : ' || emp_list.dname);
+            DBMS_OUTPUT.PUT_LINE('인원수 : ' || emp_list.cnt);
+            DBMS_OUTPUT.PUT_LINE('급여합 : ' || emp_list.salary);
+    END LOOP;
+    
+    EXCEPTION
+    WHEN OTHERS THEN
+          DBMS_OUTPUT.PUT_LINE(SQLERRM||'에러 발생');
+END;
 
+--결과는 아래와 같이 나옴.
+--부서명 : ACCOUNTING
+--인원수 : 3
+--급여합 : 8750
+--부서명 : OPERATIONS
+--인원수 : 2
+--급여합 : 7000
+--부서명 : 인사팀
+--인원수 : 2
+--급여합 : 5000
+--부서명 : RESEARCH
+--인원수 : 5
+--급여합 : 10955
+--부서명 : SALES
+--인원수 : 6
+--급여합 : 9400
 
-
-
+-------------------------------------------------------------------
+-------    Trigger 
+-------------------------------------------------------------------
 
 
 
