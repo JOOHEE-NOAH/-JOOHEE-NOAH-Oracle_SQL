@@ -138,4 +138,35 @@ END emp_tax;
 --4) 함수 호출해보기
 SELECT ename, sal, emp_tax(empno) emp_rate
 FROM emp;
-    
+
+
+--------------------EXCEPCTION 처리-------------------------------------
+-- 행동강령 : 부서번호 입력 해당 emp 정보
+-- SQL> EXECUTE DeptEmpSearch(50);
+--  조회화면 :   사번  : 1000
+--             이름  : 강감찬 
+-- 예외처리
+-- 두개의 Row가 나타날수 있음
+CREATE OR REPLACE PROCEDURE DeptEmpSearch
+(p_deptno IN  emp.deptno%TYPE)
+IS
+    --ROW 객체 선언
+    v_emp emp%ROWTYPE;
+--  v_empno emp.empno%TYPE;
+--  v_ename emp.ename%TYPE;
+BEGIN
+    DBMS_OUTPUT.ENABLE;
+    SELECT *
+    INTO v_emp
+    FROM emp
+    WHERE deptno=p_deptno;
+        DBMS_OUTPUT.PUT_LINE('사번 : '|| v_emp.empno);
+        DBMS_OUTPUT.PUT_LINE('이름 : '|| v_emp.ename);
+       
+        ----- Multi Row Error
+    EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('ERR CODE 1 : '|| TO_CHAR(SQLCODE));
+        DBMS_OUTPUT.PUT_LINE('ERR CODE 2 : '|| SQLCODE);
+        DBMS_OUTPUT.PUT_LINE('ERR MESSAGE : '|| SQLERRM);
+END DeptEmpSearch;
