@@ -40,29 +40,32 @@ EXPDP scott3/tiger Directory=mdBackup2 DUMPFILE=scott3.dmp
 C:\orabackup>
 IMPDP scott3/tiger Directory=mdBackup2 DUMPFILE=scott3.dmp
 
---------------------------------------------------
----  Backup 관리 과제
----------------------------------------------------
---1. Directory 생성  -->mdBackup7 (위치 :  c:\orabackup)
---2. USER              --> scott7(Create Table Emp_Dept생성)
---3.Backup            --> DUMPFILE=SCOTT7.dmp
---4.관련 TBL          -->2개 이상 TBL 삭제
---5.관련 삭제 TBL 복원
+-- 1. Directory 생성   ---> mdBackup7 (위치 : c:\orabackup )
+CREATE OR Replace Directory mdBackup7 as 'c:\orabackup';
+-- 2. USER            ----> scott7(Create Table Emp_Dept생성)
+ CREATE USER scott7 Identified By tiger;
+ Grant DBA TO scott7;
+-- 3. Backup          ----> DUMPFILE=scott7.dmp
+--3-1  scott7에게 mdBackup2 Read,Write  권한 허가 
+GRANT Read,Write On Directory mdBackup7 To scott7;
+-- Oracle 전체 Backup  (scott7) Console
+C:\orabackup> 
+EXPDP scott7/tiger Directory=mdBackup7 DUMPFILE=scott7.dmp
+-- 4. 관련 TBL         ----> 2개 이상 TBL 삭제
+-- 5. 관련 삭제 TBL 복원 
 
-
--- Oracle 부분 Backup후  부분 Restore  (scott3) -->department 만 부분적으로 백업
-C:\orabackup>
-exp scott3/tiger file=department.dmp tables=department
-exp: export 약자
-
--- Oracle 부분 Restore  (scott3)
-C:\orabackup>
-imp scott3/tiger file=department.dmp tables=department
-imp: import 약자
+-- Oracle 전체 Restore  (scott7)
+C:\orabackup> 
+IMPDP scott7/tiger Directory=mdBackup7 DUMPFILE=scott7.dmp
 
 -------------------------------------------------
 -----   부분 Backup 과제 2
 --------------------------------------------------
 -- 1. USER            ----> scott7(Create Table Emp_Dept생성)
--- 2. Backup          ----> professor Table
--- 3. 관련 TBL 삭제  복원
+-- Oracle 부분 Backup (scott7)    ----> professor Table
+C:\orabackup> 
+exp scott7/tiger   file=professor.dmp   tables=professor
+-- 3. 관련 TBL 삭제  복원 
+-- Oracle 부분 Restore  (scott7)
+C:\orabackup> 
+imp scott7/tiger file=professor.dmp    tables=professor
