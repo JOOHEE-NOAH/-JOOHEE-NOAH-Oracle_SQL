@@ -374,6 +374,18 @@ END;
 -------------------------------------------------------------------
 -------    Trigger 
 -------------------------------------------------------------------
+CREATE OR REPLACE TRIGGER trigger_test
+BEFORE
+UPDATE ON dept
+FOR EACH ROW -- old, new 사용하기 위해
+BEGIN
+    DBMS_OUTPUT.ENABLE;
+    DBMS_OUTPUT.PUT_LINE('변경 전 컬럼 값 : ' || :old.dname);
+    DBMS_OUTPUT.PUT_LINE('변경 후 컬럼 값 : ' || :new.dname);
+END;
 
+UPDATE dept
+SET loc = '신촌3'
+WHERE deptno = 41;
 
-
+-- 상단 메뉴-> 보기 -> DBMS 출력 -> DBMS 출력 창에서 + 에서 선택하고 update 실행.
