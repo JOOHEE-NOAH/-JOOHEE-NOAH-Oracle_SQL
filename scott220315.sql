@@ -256,3 +256,37 @@ END;
 --개발자 정의 EXCEPTION
 --최저 임금제  --> 1000만원 이상 1000만 이하 들어오면 에러발생하게 할거임.
 -----------------------------------------------------------
+create or replace PROCEDURE in_emp
+(p_name     IN   emp.ename%TYPE,
+ p_sal     IN   emp.sal%TYPE,
+ p_job     IN   emp.job%TYPE,
+ p_deptno     IN   emp.deptno%TYPE
+)
+IS
+    v_empno emp.empno%TYPE;
+    lowsal_err  Exception;
+BEGIN
+    DBMS_OUTPUT.ENABLE;
+    SELECT MAX(empno)+1
+    INTO v_empno
+    FROM emp ;
+    IF  p_sal >= 1000 THEN
+        INSERT INTO emp(  empno,  ename,   sal,   job,   deptno, hiredate)
+                 VALUES(v_empno, p_name, p_sal, p_job, p_deptno, SYSDATE);
+    ELSE
+        RAISE lowsal_err;
+    END IF;
+    EXCEPTION
+        WHEN lowsal_err THEN
+        DBMS_OUTPUT.PUT_LINE('ERROR!!!-지정한 급여가 너무 적습니다. 1000이상으로 다시 입력하세요');      
+END;
+
+
+
+
+
+
+
+
+
+
