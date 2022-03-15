@@ -170,3 +170,89 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('ERR CODE 2 : '|| SQLCODE);
         DBMS_OUTPUT.PUT_LINE('ERR MESSAGE : '|| SQLERRM);
 END DeptEmpSearch;
+
+---------------------------------------------------------
+--  cursor 문 ★★★★★★★★★★★★★ pl/sql의 끝판왕
+-- EXECUTE 문을 이용해 함수를 실행합니다.
+-- SQL>EXECUTE show_emp3(7900);
+---------------------------------------------------------
+CREATE OR REPLACE PROCEDURE show_emp3
+(p_empno    IN  emp.empno%TYPE)
+IS  
+    CURSOR emp_cursor IS
+    SELECT ename, job, sal
+    FROM emp
+    WHERE empno LIKE p_empno||'%';
+    
+    v_ename emp.ename%TYPE;
+    v_sal emp.sal%TYPE;
+    v_job emp.job%TYPE;
+BEGIN
+    OPEN emp_cursor;
+        DBMS_OUTPUT.PUT_LINE('이름    '|| '업무'||'급여');
+        DBMS_OUTPUT.PUT_LINE('----------------------');
+    LOOP
+        FETCH emp_cursor INTO v_ename, v_job, v_sal;
+        EXIT WHEN emp_cursor%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(v_ename||'    '|| v_job ||'     ' || v_sal);
+    END LOOP;
+        DBMS_OUTPUT.PUT_LINE(emp_cursor%ROWCOUNT|| '개의 행 선택');
+    CLOSE emp_cursor;
+END;
+
+-- 77 입력하여 나오는 결과물
+--이름    업무급여
+------------------------
+--CLARK    MANAGER     2450
+--SCOTT    ANALYST     3000
+--2개의 행 선택
+
+
+-----------------------------------------------------------
+--오라클 PL/SQL은 자주 일어나는 몇가지 예외를 미리 정의해 놓았으며, 
+--이러한 예외는 개발자가 따로 선언할 필요가 없다.
+--미리 정의된 예외의 종류
+-- NO_DATA_FOUND : SELECT문이 아무런 데이터 행을 반환하지 못할 때
+-- DUP_VAL_ON_INDEX : UNIQUE 제약을 갖는 컬럼에 중복되는 데이터 INSERT 될 때
+-- ZERO_DIVIDE : 0으로 나눌 때
+-- INVALID_CURSOR : 잘못된 커서 연산
+-----------------------------------------------------------
+CREATE OR REPLACE PROCEDURE PreException_test
+(v_deptno IN emp.deptno%TYPE)
+IS
+    v_emp emp%ROWTYPE;
+BEGIN
+    DBMS_OUTPUT.ENABLE;
+    SELECT empno, ename, deptno
+    INTO   v_emp.empno, v_emp.ename, v_emp.deptno
+    FROM    emp
+    WHERE   deptno = v_deptno;
+    
+    DBMS_OUTPUT.PUT_LINE('사번 : '|| v_emp.empno);
+    DBMS_OUTPUT.PUT_LINE('이름 : '|| v_emp.ename);
+    DBMS_OUTPUT.PUT_LINE('부서번호 : '|| v_emp.deptno);
+    
+    EXCEPTION
+    WHEN DUP_VAL_ON_INDEX THEN
+                DBMS_OUTPUT.PUT_LINE('중복 데이터가 존재합니다.');
+                DBMS_OUTPUT.PUT_LINE('DUP_VAL_ON_INDEX에러 발생');
+    WHEN TOO_MANY_ROWS THEN
+                DBMS_OUTPUT.PUT_LINE('TOO_MANY_ROWS에러 발생');
+    WHEN NO_DATA_FOUND THEN
+                DBMS_OUTPUT.PUT_LINE('NO_DATA_FOUND에러 발생');
+    WHEN OTHERS THEN
+                DBMS_OUTPUT.PUT_LINE('기타 에러 발생');
+    
+END;
+
+--10입력해 실행시키면 오류발생
+--ORA-01422: exact fetch returns more than requested number of rows
+--ORA-06512: at "SCOTT.PREEXCEPTION_TEST", line 7
+--ORA-06512: at line 6
+-- 따라서 EXCEPTION처리
+
+
+-----------------------------------------------------------
+--개발자 정의 EXCEPTION
+--최저 임금제  --> 1000만원 이상 1000만 이하 들어오면 에러발생하게 할거임.
+-----------------------------------------------------------
