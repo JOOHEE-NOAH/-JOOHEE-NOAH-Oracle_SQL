@@ -94,3 +94,79 @@ INSERT INTO emp(empno, ename, sal, deptno)
 INSERT INTO emp(empno, ename, sal, deptno)
         VALUES(3100,'김주희', 3400, 40);
 DELETE emp WHERE empno = 1004;
+
+
+---------------------------------------------------------------------------------------
+-----    Package -> 인터페이스 같은거라고 생각해라
+--header와 body로 나눠짐
+----------------------------------------------------------------------------------------
+
+-- 1.Header -->  역할 : 선언 (Interface 역할)
+--                여러 PROCEDURE 선언 가능
+CREATE OR REPLACE PACKAGE emp_info AS  -->자바: 클라스명같은 것
+    PROCEDURE all_emp_info; -- 모든 사원의 사원 정보
+    PROCEDURE all_sal_info; -- 모든 사원의 급여 정보
+    
+    
+END  emp_info;
+
+--2.body 역할 : 실제 구현
+CREATE OR REPLACE PACKAGE BODY emp_info AS
+    -----------------------------------------------------------------
+    -- 모든 사원의 사원 정보(사번, 이름, 입사일)
+    -- 1. CURSOR  : emp_cursor 
+    -- 2. FOR  IN
+    -- 3. DBMS  -> 각각 줄 바꾸어 사번,이름,입사일 
+    -----------------------------------------------------------------
+    PROCEDURE all_emp_info
+    IS
+    CURSOR emp_cursor IS
+    SELECT empno, ename, to_char(hiredate, 'yyyy/mm/dd') hiredate
+    FROM emp
+    ORDER BY hiredate;
+        
+    BEGIN
+        DBMS_OUTPUT.ENABLE;    
+        FOR emp IN emp_cursor LOOP
+            DBMS_OUTPUT.PUT_LINE('사번 : '|| emp.empno);
+            DBMS_OUTPUT.PUT_LINE('이름 : '|| emp.ename);
+            DBMS_OUTPUT.PUT_LINE('입사일 : '|| emp.hiredate);
+        END LOOP;   
+        EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE(SQLERRM||'에러 발생');
+    END all_emp_info; -->프로시저 엔드
+   
+    -----------------------------------------------------------------
+    -- 모든 사원의 급여 정보
+    -- 1. CURSOR  : emp_cursor 
+    -- 2. FOR  IN
+    -- 3. DBMS  -> 각각 줄 바꾸어 전체급여평균 , 최대급여금액 , 최소급여금액
+   -----------------------------------------------------------------
+    PROCEDURE all_sal_info
+    IS
+    CURSOR emp_cursor IS
+    SELECT ROUND(AVG(sal),3) avg, MAX(sal) max, MIN(sal) min
+    FROM emp;
+  --GROUP BY deptno; --> 부서별로 뽑고 싶을 경우
+    BEGIN
+        DBMS_OUTPUT.ENABLE;    
+        FOR emp IN emp_cursor LOOP
+            DBMS_OUTPUT.PUT_LINE('전체급여평균 : '|| emp.avg);
+            DBMS_OUTPUT.PUT_LINE('최대급여금액 : '|| emp.max);
+            DBMS_OUTPUT.PUT_LINE('최소급여금액 : '|| emp.min);
+        END LOOP;   
+        EXCEPTION
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE(SQLERRM||'에러 발생');
+    
+    END all_sal_info;
+END emp_info; -->패키지 엔드
+
+
+
+
+
+
+
+
