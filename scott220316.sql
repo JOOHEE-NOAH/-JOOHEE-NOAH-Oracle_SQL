@@ -224,8 +224,25 @@ CREATE OR REPLACE PACKAGE BODY emp_info AS
     
 END emp_info; -->패키지 엔드
 
-    
 
+--Output 예시
+CREATE OR REPLACE PROCEDURE Emp_Info2
+( p_empno IN emp.empno%TYPE, p_ename OUT emp.ename%TYPE, p_sal OUT emp.sal%TYPE )
+IS
+-- %TYPE 데이터형 변수 선언
+v_empno emp.empno%TYPE;
+BEGIN
+        DBMS_OUTPUT.ENABLE;
+        -- %TYPE 데이터형 변수 사용
+        SELECT empno, ename, sal
+        INTO v_empno, p_ename, p_sal
+        FROM emp
+        WHERE empno = p_empno ;
+        -- 결과값 출력                            ascii코드 10 LF ( Line Feed => 다음 줄로... ), 13CR ( Cariage Return => 제일 처음 칸으로... )
+        DBMS_OUTPUT.PUT_LINE('사원번호 : ' || v_empno || CHR(10) || CHR(13) || '줄바뀜');
+        DBMS_OUTPUT.PUT_LINE('사원이름 : ' || p_ename );
+        DBMS_OUTPUT.PUT_LINE('사원급여 : ' || p_sal );
+END;
 
 
 
