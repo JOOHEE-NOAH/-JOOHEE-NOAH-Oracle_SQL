@@ -1,5 +1,5 @@
 -------------------------------------------------------------------
--------    Trigger 
+-------    Trigger : 주의! 무결성용으로 사용하지 말것/트리거에서는 선언을 is가 아닌 declare로 함
 -------------------------------------------------------------------
 CREATE OR REPLACE TRIGGER trigger_test
 BEFORE
@@ -9,6 +9,7 @@ BEGIN
     DBMS_OUTPUT.ENABLE;
     DBMS_OUTPUT.PUT_LINE('변경 전 컬럼 값 : ' || :old.loc);
     DBMS_OUTPUT.PUT_LINE('변경 후 컬럼 값 : ' || :new.loc);
+    
 END;
 
 UPDATE dept
@@ -243,7 +244,7 @@ BEGIN
         DBMS_OUTPUT.PUT_LINE('사원이름 : ' || p_ename );
         DBMS_OUTPUT.PUT_LINE('사원급여 : ' || p_sal );
 END;
-
+--
 
 
 
